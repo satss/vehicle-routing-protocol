@@ -1,3 +1,4 @@
+import math
 import random
 
 distances = {
@@ -15,7 +16,8 @@ initial_temperature = 100
 cooling_rate = 0.9
 stopping_temperature = 2
 
-iterations = 1000
+# not optimal iteration can bring the value up or down
+iterations = 10000000
 
 
 def generate_neighbour(route: list) ->list:
@@ -40,21 +42,34 @@ def calculate_distance(given_route: list) -> int:
 def simulated_annealing_algorithm(initial_temperature:int, cooling_rate:float, stopping_temperature:int, iterations:int):
    current_route = list(distances.keys())
    print(current_route)
-   currrent_distance = calculate_distance(current_route)
+   current_distance = calculate_distance(current_route)
    best_route = current_route.copy()
-   best_distance= currrent_distance
+   best_distance= current_distance
    temperature = initial_temperature
 
-   for i in range(2):
+   for i in range(iterations):
        new_route = generate_neighbour(current_route)
        neighbor_distance = calculate_distance(new_route)
+       delta_e = neighbor_distance - current_distance
+
+       if delta_e < 0:
+           current_route = new_route.copy()
+           current_distance = neighbor_distance
+           if current_distance < best_distance:
+               best_route = new_route.copy()
+               best_distance = current_distance
+       else:
+           probability = math.exp(-delta_e/temperature)
+
+           if random.random() < probability:
+               current_route = new_route.copy()
+               current_distance = neighbor_distance
+       temperature *= cooling_rate
+       if temperature < stopping_temperature:
+           break
+   return best_route, best_distance
 
 
-
-
-
-
-
-
-
-simulated_annealing_algorithm(initial_temperature, cooling_rate, stopping_temperature, iterations)
+route, distance = simulated_annealing_algorithm(initial_temperature, cooling_rate, stopping_temperature, iterations)
+print(route)
+print(distance)
