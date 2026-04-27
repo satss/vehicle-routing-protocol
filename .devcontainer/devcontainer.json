@@ -1,0 +1,43 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
+        "github.vscode-github-actions",
+        "openai.chatgpt"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
+      }
+    }
+  },
+  "containerEnv": {
+    "UV_LINK_MODE": "copy",
+    "PROMPT_COMMAND": "history -a",
+    "HISTFILE": "/home/vscode/.history_volume/.history",
+    "HIST_PERSIST_DIR": "/home/vscode/.history_volume"
+  },
+  "initializeCommand": "mkdir -p ${localWorkspaceFolder}/.devcontainer/.history",
+  "forwardPorts": [
+    3000,
+    8002,
+    8080,
+    9090
+  ],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer/.history,target=/home/vscode/.history_volume,type=bind,consistency=cached",
+    "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "source=${env:HOME}/.config/git,target=/home/vscode/.config/git,type=bind,consistency=cached"
+  ],
+  "postCreateCommand": "bash .devcontainer/post_create.sh",
+  "postStartCommand": "bash .devcontainer/post_start.sh"
+}

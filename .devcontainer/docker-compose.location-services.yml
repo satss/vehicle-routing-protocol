@@ -1,0 +1,31 @@
+services:
+  nominatim:
+    image: mediagis/nominatim:5.1
+    container_name: local-nominatim
+    ports:
+      - "8080:8080"
+    environment:
+      PBF_URL: https://download.geofabrik.de/europe/germany/nordrhein-westfalen-latest.osm.pbf
+      FREEZE: "true"
+      IMPORT_WIKIPEDIA: "false"
+      IMPORT_US_POSTCODES: "false"
+      NOMINATIM_PASSWORD: nominatim
+      THREADS: "1"
+    shm_size: 1gb
+    volumes:
+      - nominatim_database_data:/var/lib/postgresql
+
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:latest
+    container_name: local-valhalla
+    ports:
+      - "8002:8002"
+    environment:
+      tile_urls: "https://download.geofabrik.de/europe/germany/nordrhein-westfalen-latest.osm.pbf"
+      force_rebuild: "False"
+      build_elevation: "False"
+    volumes:
+      - ../infra/valhalla/custom_files:/custom_files
+
+volumes:
+  nominatim_database_data:
